@@ -1,10 +1,10 @@
 #criar base da dados
 
-CREATE DATABASE IF NOT EXIST HortFruit;
+CREATE DATABASE IF NOT EXISTS HortFruit;
 
 #criar tabelas
 
-CREATE TABLE IF NOT EXIST cliente(
+CREATE TABLE IF NOT EXISTS cliente(
 
 	cod int AUTO_INCREMENT NOT NULL,
 	cpf VARCHAR(11) NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXIST cliente(
 	PRIMARY KEY(cod,numero)
 ) 
 
-CREATE TABLE IF NOT EXIST forma_pagamento(
+CREATE TABLE IF NOT EXISTS forma_pagamento(
 
 	cod INT AUTO_INCREMENT NOT NULL,
 	tipo VARCHAR(10) NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXIST forma_pagamento(
 	PRIMARY KEY(cod)
 )
 
-CREATE TABLE IF NOT EXIST cadastrar(
+CREATE TABLE IF NOT EXISTS cadastrar(
 
 	cod_cliente INT AUTO_INCREMENT NOT NULL,	
 	cod_pagCad INT AUTO_INCREMENT NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXIST cadastrar(
 
 # adicao de coluna da tabela Historico_Preco e na tabela  Produto
 
-CREATE TABLE IF NOT EXIST produto(
+CREATE TABLE IF NOT EXISTS produto(
 
 	cod VARCHAR(10) NOT NULL,
 	nome VARCHAR(20) NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXIST produto(
 )
 
 
-CREATE TABLE IF NOT EXIST categoria(
+CREATE TABLE IF NOT EXISTS categoria(
 
 	cod VARCHAR(10) NOT NULL,
 	nome VARCHAR(20) NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXIST categoria(
 	PRIMARY KEY(cod)
 )
 
-CREATE TABLE IF NOT EXIST produto_categoria(
+CREATE TABLE IF NOT EXISTS produto_categoria(
 
 	cod_prod VARCHAR(10) NOT NULL,
 	cod_cat VARCAHR(10) NOT NULL
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXIST produto_categoria(
 
 #Adição de coluna da tabela ponto na tabela colaborador
 
-CREATE TABLE IF NOT EXIST colaborador(
+CREATE TABLE IF NOT EXISTS colaborador(
 
  	cpf VARCHAR(11) NOT NULL,
 	nome VARCHAR(50) NOT NULL,
@@ -97,19 +97,19 @@ CREATE TABLE IF NOT EXIST colaborador(
 	PRIMARY KEY(cpf)
 )
 
-CREATE TABLE IF NOT EXIST colaborador.gerente(
+CREATE TABLE IF NOT EXISTS colaborador.gerente(
 
 	area VARCHAR(10) NOT NULL,
 )
 
-CREATE TABLE IF NOT EXIST colaborador.funcionario(
+CREATE TABLE IF NOT EXISTS colaborador.funcionario(
 
 	funcao VARCHAR(50) NOT NULL
 
 )
 
 
-CREATE TABLE IF NOT EXIST venda(
+CREATE TABLE IF NOT EXISTS venda(
 
 	nota_fiscal VARCHAR(20) NOT NULL,
 	nome_produto VARCHAR(20) NOT NULL,
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXIST venda(
 	PRIMARY KEY(nota_fiscal)
 
 
-CREATE TABLE IF NOT EXIST venda_produto(
+CREATE TABLE IF NOT EXISTS venda_produto(
 
 	nota_fiscal VARCHAR(20) NOT NULL,	
 	cod VARCHAR(10) NOT NULL,
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXIST venda_produto(
 
 )
 
-CREATE TABLE IF NOT EXIST fornecedor(
+CREATE TABLE IF NOT EXISTS fornecedor(
 
 	cnpj VARCHAR(20) NOT NULL,
 	nome VARCHAR(20) NOT NULL,
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXIST fornecedor(
 	PRIMARY KEY(cnpj)
 )
 
-CREATE TABLE IF NOT EXIST contrata(
+CREATE TABLE IF NOT EXISTS contrata(
 
 	cpf_gerente VARCHAR(11) NOT NULL,
 	cnpj_fornecedor VARCHAR(20) NOT NULL,
@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXIST contrata(
 )
 
 
-CREATE TABLE IF NOT EXIST entrega(
+CREATE TABLE IF NOT EXISTS entrega(
 
 	cod VARCHAR(10) NOT NULL,
 	nome_cliente VARCHAR(50)
@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXIST entrega(
 
 )
 
-CREATE TABLE IF NOT EXIST fornecedor_entrega(
+CREATE TABLE IF NOT EXISTS fornecedor_entrega(
 
 	cnpj_fornecedor VARCHAR(20) NOT NULL,
 	cod_entrega VARCHAR(10) NOT NULL,
@@ -182,7 +182,7 @@ CREATE TABLE IF NOT EXIST fornecedor_entrega(
 	CONSTRAINT fk_entrega_fornecedor_entrega FOREIGN KEY cod_entrega REFERENCES entrega(cod)
 )
 
-CREATE TABLE IF NOT EXIST entrega_produto(
+CREATE TABLE IF NOT EXISTS entrega_produto(
 
 	cod_prod VARCHAR(10) NOT NULL,
 	cod_entrega VARCHAR(10) NOT NULL,
