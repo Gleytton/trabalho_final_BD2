@@ -1,6 +1,6 @@
 #criar base da dados
 
-CREATE DATABASE IF NOT EXISTS HortFruit;
+CREATE DATABASE HortFruit;
 
 #criar tabelas
 
@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS cliente(
 	validade DATE NOT NULL,
 	codSeguranca VARCHAR(5) NOT NULL,
 
-	PRIMARY KEY(cod,numero)
-) 
+	PRIMARY KEY(cod,numero_cartao)
+) ;
 
 CREATE TABLE IF NOT EXISTS forma_pagamento(
 
@@ -27,19 +27,18 @@ CREATE TABLE IF NOT EXISTS forma_pagamento(
 	tipo VARCHAR(10) NOT NULL,
 
 	PRIMARY KEY(cod)
-)
+);
 
 CREATE TABLE IF NOT EXISTS cadastrar(
 
-	cod_cliente INT AUTO_INCREMENT NOT NULL,	
-	cod_pagCad INT AUTO_INCREMENT NOT NULL,
+	cod_cliente INT  NOT NULL,	
+	cod_pagCad INT  NOT NULL,
 
-	CONSTRAINT fk_cliente_cadastro FOREIGN KEY cod_cliente REFERENCES cliente(cod)
-	cONSTRAINT fk_forma_pagamento_cadastro FOREIGN KEY cod_pagCad REFERENCES forma_pagamento(cod)
+	CONSTRAINT fk_cliente_cadastro FOREIGN KEY (cod_cliente) REFERENCES cliente(cod),
+	CONSTRAINT fk_forma_pagamento_cadastro FOREIGN KEY (cod_pagCad) REFERENCES forma_pagamento(cod),
 
 	PRIMARY KEY (cod_cliente, cod_pagCad)
-)
-
+);
 
 # TABELA cartao_fidelidade FUI FUNDIDA A TABELA cliente 
 
@@ -54,11 +53,11 @@ CREATE TABLE IF NOT EXISTS produto(
 	nome VARCHAR(20) NOT NULL,
 	tipo VARCHAR(10) NOT NULL,
 	quant INT NOT NULL,
-	valor_unitario REAL(4,2) NOT NULL,
+	valor_unitario DECIMAL(4,2) NOT NULL,
 	data DATETIME NOT NULL,
 
 	PRIMARY KEY(cod)
-)
+);
 
 
 CREATE TABLE IF NOT EXISTS categoria(
@@ -68,19 +67,19 @@ CREATE TABLE IF NOT EXISTS categoria(
 	tipo VARCHAR(10) NOT NULL,
 
 	PRIMARY KEY(cod)
-)
+);
 
-CREATE TABLE IF NOT EXISTS produto_categoria(
+CREATE TABLE IF NOT EXISTS produto_categoria (
 
 	cod_prod VARCHAR(10) NOT NULL,
-	cod_cat VARCAHR(10) NOT NULL
+	cod_cat VARCHAR(10) NOT NULL,
+	
+	PRIMARY KEY (cod_prod),
 
 	CONSTRAINT fk_Prod_ProdCat FOREIGN KEY(cod_prod) REFERENCES produto(cod),
-	CONSTRAINT fk_Cat_ProdCat FOREIGN KEY(cod_cat) REFERENCES categoria(cod),
+	CONSTRAINT fk_Cat_ProdCat FOREIGN KEY(cod_cat) REFERENCES categoria(cod)
 
-	PRIMARY KEY (cod_prod)
-
-)
+);
 
 
 #Adição de coluna da tabela ponto na tabela colaborador
@@ -95,18 +94,22 @@ CREATE TABLE IF NOT EXISTS colaborador(
 	ponto DATETIME,
 	atribuicao VARCHAR(100) NOT NULL,
 	PRIMARY KEY(cpf)
-)
+);
 
-CREATE TABLE IF NOT EXISTS colaborador.gerente(
+CREATE TABLE IF NOT EXISTS colaborador_gerente(
 
+	cpf VARCHAR(11) NOT NULL,
 	area VARCHAR(10) NOT NULL,
-)
+	CONSTRAINT fk_colador_colaborador_gerente  FOREIGN KEY cpf REFERENCES colaborador(cpf)
+);
 
-CREATE TABLE IF NOT EXISTS colaborador.funcionario(
+CREATE TABLE IF NOT EXISTS colaborador_funcionario(
 
+	cpf VARCHAR(11) NOT NULL,
 	funcao VARCHAR(50) NOT NULL
+	CONSTRAINT fk_colador_colaborador_funcionario  FOREIGN KEY cpf REFERENCES colaborador(cpf)
 
-)
+);
 
 
 CREATE TABLE IF NOT EXISTS venda(
@@ -116,26 +119,27 @@ CREATE TABLE IF NOT EXISTS venda(
 	nome_funcionario VARCHAR(50) NOT NULL,
 	nome_cliente VARCHAR(50) NOT NULL,
 
-	CONSTRAINT fk_venda_funcionario FOREIGN KEY nome_funcionario REFERENCES funcionario(nome)
-	CONSTRAINT fk_venda_cliente FOREIGN KEY nome_cliente REFERENCES cliente(nome)
+	CONSTRAINT fk_venda_funcionario FOREIGN KEY (nome_funcionario) REFERENCES funcionario(nome),
+	CONSTRAINT fk_venda_cliente FOREIGN KEY (nome_cliente) REFERENCES cliente(nome),
 
 	PRIMARY KEY(nota_fiscal)
 
+);
 
 CREATE TABLE IF NOT EXISTS venda_produto(
 
 	nota_fiscal VARCHAR(20) NOT NULL,	
 	cod VARCHAR(10) NOT NULL,
 	quant INT NOT NULL,
-	valor_unitario REAL(4,2) NOT NULL,
-	valor REAL(4,2) NOT NULL,
+	valor_unitario DECIMAL(4,2) NOT NULL,
+	valor DECIMAL(4,2) NOT NULL,
 
-	CONSTRAINT fk_venda_venda_produto FOREIGN KEY nota_fiscal REFERENCES venda(nota_fiscal)
-	CONSTRAINT fk_produto_venda_produto FOREIGN KEY cod REFERENCES produto(cod)
+	CONSTRAINT fk_venda_venda_produto FOREIGN KEY (nota_fiscal) REFERENCES venda(nota_fiscal),
+	CONSTRAINT fk_produto_venda_produto FOREIGN KEY (cod) REFERENCES produto(cod),
 
 	PRIMARY KEY(nota_fiscal,cod)
 
-)
+);
 
 CREATE TABLE IF NOT EXISTS fornecedor(
 
@@ -146,7 +150,7 @@ CREATE TABLE IF NOT EXISTS fornecedor(
 	telefone VARCHAR(10) NOT NULL,
 
 	PRIMARY KEY(cnpj)
-)
+);
 
 CREATE TABLE IF NOT EXISTS contrata(
 
@@ -154,22 +158,22 @@ CREATE TABLE IF NOT EXISTS contrata(
 	cnpj_fornecedor VARCHAR(20) NOT NULL,
 	data DATETIME,
 
-	CONSTRAINT fk_Funcionario_Contrata FOREIGN KEY cpf_gerente REFERENCES colaborador(cpf) ,
-	CONSTRAINT fk_Fornecedor_Contrata FOREIGN KEY cnpj_fornecedor REFERENCES fornecedor(cnpj),
+	CONSTRAINT fk_Funcionario_Contrata FOREIGN KEY (cpf_gerente) REFERENCES colaborador(cpf) ,
+	CONSTRAINT fk_Fornecedor_Contrata FOREIGN KEY (cnpj_fornecedor) REFERENCES fornecedor(cnpj),
 
 	PRIMARY KEY (cpf_gerente, cnpj_fornecedor)
-)
+);
 
 
 CREATE TABLE IF NOT EXISTS entrega(
 
 	cod VARCHAR(10) NOT NULL,
-	nome_cliente VARCHAR(50)
-	data_ent DATETIME, NOT NULL
+	nome_cliente VARCHAR(50),
+	data_ent DATETIME NOT NULL,
  
 	PRIMARY KEY(cod)
 
-)
+);
 
 CREATE TABLE IF NOT EXISTS fornecedor_entrega(
 
@@ -178,9 +182,9 @@ CREATE TABLE IF NOT EXISTS fornecedor_entrega(
 
 	PRIMARY KEY(cnpj_fornecedor,cod_entrega),
 
-	CONSTRAINT fk_fornecedor_fornecedor_entrega FOREIGN KEY cnpj_fornecedor REFERENCES fornecedor(cnpj),
-	CONSTRAINT fk_entrega_fornecedor_entrega FOREIGN KEY cod_entrega REFERENCES entrega(cod)
-)
+	CONSTRAINT fk_fornecedor_fornecedor_entrega FOREIGN KEY (cnpj_fornecedor) REFERENCES fornecedor(cnpj),
+	CONSTRAINT fk_entrega_fornecedor_entrega FOREIGN KEY (cod_entrega) REFERENCES entrega(cod)
+);
 
 CREATE TABLE IF NOT EXISTS entrega_produto(
 
@@ -189,9 +193,9 @@ CREATE TABLE IF NOT EXISTS entrega_produto(
 
 	PRIMARY KEY(cod_prod,cod_entrega),
 
-	CONSTRAINT fk_produto_entrega_produto FOREIGN KEY cod_prod REFERENCES produto(cod),
+	CONSTRAINT fk_produto_entrega_produto FOREIGN KEY (cod_prod) REFERENCES produto(cod),
 
-	CONSTRAINT fk_entrega_entrega_produto FOREIGN KEY cod_entrega REFERENCES entrega(cod)
+	CONSTRAINT fk_entrega_entrega_produto FOREIGN KEY (cod_entrega) REFERENCES entrega(cod)
 
 
-)
+);
