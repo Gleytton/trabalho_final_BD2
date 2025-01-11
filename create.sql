@@ -100,14 +100,14 @@ CREATE TABLE IF NOT EXISTS colaborador_gerente(
 
 	cpf VARCHAR(11) NOT NULL,
 	area VARCHAR(10) NOT NULL,
-	CONSTRAINT fk_colador_colaborador_gerente  FOREIGN KEY cpf REFERENCES colaborador(cpf)
+	CONSTRAINT fk_colador_colaborador_gerente  FOREIGN KEY (cpf) REFERENCES colaborador(cpf)
 );
 
 CREATE TABLE IF NOT EXISTS colaborador_funcionario(
 
 	cpf VARCHAR(11) NOT NULL,
 	funcao VARCHAR(50) NOT NULL
-	CONSTRAINT fk_colador_colaborador_funcionario  FOREIGN KEY cpf REFERENCES colaborador(cpf)
+	CONSTRAINT fk_colador_colaborador_funcionario  FOREIGN KEY (cpf) REFERENCES colaborador(cpf)
 
 );
 
