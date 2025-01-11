@@ -1,12 +1,11 @@
 #criar base da dados
-
 CREATE DATABASE HortFruit;
 
 #criar tabelas
 
 CREATE TABLE IF NOT EXISTS cliente(
 
-	cod int AUTO_INCREMENT NOT NULL,
+	cod int  NOT NULL,
 	cpf VARCHAR(11) NOT NULL,
 	nome VARCHAR(50) NOT NULL,
 	endereco VARCHAR(100) NOT NULL,
@@ -106,7 +105,7 @@ CREATE TABLE IF NOT EXISTS colaborador_gerente(
 CREATE TABLE IF NOT EXISTS colaborador_funcionario(
 
 	cpf VARCHAR(11) NOT NULL,
-	funcao VARCHAR(50) NOT NULL
+	funcao VARCHAR(50) NOT NULL,
 	CONSTRAINT fk_colador_colaborador_funcionario  FOREIGN KEY (cpf) REFERENCES colaborador(cpf)
 
 );
@@ -116,11 +115,11 @@ CREATE TABLE IF NOT EXISTS venda(
 
 	nota_fiscal VARCHAR(20) NOT NULL,
 	nome_produto VARCHAR(20) NOT NULL,
-	nome_funcionario VARCHAR(50) NOT NULL,
-	nome_cliente VARCHAR(50) NOT NULL,
+	cpf_funcionario VARCHAR(50) NOT NULL,
+	cod_cliente int NOT NULL,
 
-	CONSTRAINT fk_venda_funcionario FOREIGN KEY (nome_funcionario) REFERENCES funcionario(nome),
-	CONSTRAINT fk_venda_cliente FOREIGN KEY (nome_cliente) REFERENCES cliente(nome),
+	CONSTRAINT fk_venda_colaborador FOREIGN KEY (cpf_funcionario) REFERENCES colaborador(cpf),
+	CONSTRAINT fk_venda_cliente FOREIGN KEY (cod_cliente) REFERENCES cliente(cod),
 
 	PRIMARY KEY(nota_fiscal)
 
