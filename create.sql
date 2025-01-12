@@ -119,6 +119,7 @@ CREATE TABLE IF NOT EXISTS venda(
 	cpf_funcionario VARCHAR(50) NOT NULL,
 	cod_cliente int NOT NULL,
 	total DECIMAL(10, 2),
+	data DATETIME NOT NULL,
 	CONSTRAINT fk_venda_colaborador FOREIGN KEY (cpf_funcionario) REFERENCES colaborador(cpf),
 	CONSTRAINT fk_venda_cliente FOREIGN KEY (cod_cliente) REFERENCES cliente(cod),
 
