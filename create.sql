@@ -199,3 +199,12 @@ CREATE TABLE IF NOT EXISTS entrega_produto(
 
 
 );
+-- Tabela que registra as alterações de preço
+CREATE TABLE IF NOT EXISTS historico_preco (
+	cod VARCHAR(10) NOT NULL PRIMARY KEY,
+	cod_produto VARCHAR(10) NOT NULL,
+	preco DECIMAL(4,2),
+	data_inicio TIMESTAMP,
+	data_fim TIMESTAMP,
+	FOREIGN KEY (cod_produto) REFERENCES produto (cod),
+);
