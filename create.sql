@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS cliente(
 	dataEmissao DATE NOT NULL,
 	validade DATE NOT NULL,
 	codSeguranca VARCHAR(5) NOT NULL,
+	pontos INT NOT NULL,
 
 	PRIMARY KEY(cod,numero_cartao)
 ) ;
