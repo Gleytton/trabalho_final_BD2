@@ -20,7 +20,10 @@ SELECT ep.cod_entrega FROM entrega_produto AS ep , produto AS p WHERE ep.cod_pro
 
 -- #6- Retorna o cliente com maior numero de pontos no cartão fidelidade e o número de pontos:
 
-SELECT c.nome, MAX(c_pontos) AS MAIOR_PONTO FROM cliente AS c;
+SELECT c.nome, MAX(c_pontos) AS MAIOR_PONTO 
+FROM cliente AS c 
+GROUP BY c.nome
+ORDER BY MAIOR_PONTO DESC LIMIT 1;
 
 -- #7- Quantidade de produtos vendidos em uma venda X
 
@@ -39,5 +42,9 @@ WHERE cl.nome  = "x";
 
 -- #10- Retorna o produto mais vendido
 
-SELECT p.nome, MAX(p.quant) AS MAIOR_QUANTIDADE FROM produto AS p;  
+SELECT p.nome, MAX(p.quant) AS MAIOR_QUANTIDADE 
+FROM produto AS p 
+GROUP BY p.nome
+ORDER BY MAIOR_QUANTIDADE 
+DESC LIMIT 1;  
 
