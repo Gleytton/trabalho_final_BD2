@@ -118,7 +118,8 @@ CREATE TABLE IF NOT EXISTS venda(
 	nome_produto VARCHAR(20) NOT NULL,
 	cpf_funcionario VARCHAR(50) NOT NULL,
 	cod_cliente int NOT NULL,
-
+	total DECIMAL(10, 2),
+	data DATETIME NOT NULL,
 	CONSTRAINT fk_venda_colaborador FOREIGN KEY (cpf_funcionario) REFERENCES colaborador(cpf),
 	CONSTRAINT fk_venda_cliente FOREIGN KEY (cod_cliente) REFERENCES cliente(cod),
 
@@ -198,4 +199,13 @@ CREATE TABLE IF NOT EXISTS entrega_produto(
 	CONSTRAINT fk_entrega_entrega_produto FOREIGN KEY (cod_entrega) REFERENCES entrega(cod)
 
 
+);
+-- Tabela que registra as alterações de preço
+CREATE TABLE IF NOT EXISTS historico_preco (
+	cod VARCHAR(10) NOT NULL PRIMARY KEY,
+	cod_produto VARCHAR(10) NOT NULL,
+	preco DECIMAL(4,2),
+	data_inicio TIMESTAMP,
+	data_fim TIMESTAMP,
+	FOREIGN KEY (cod_produto) REFERENCES produto (cod),
 );
