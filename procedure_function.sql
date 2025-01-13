@@ -7,7 +7,7 @@ CREATE PROCEDURE atualizar_preco_produto (
 BEGIN
 	UPDATE produto
     SET valor_unitario = p_novo_preco, data = NOW()
-	WHERE id = p_produto_id;
+	WHERE cod = p_produto_id;
 END $$
 DELIMITER ;
 
@@ -63,7 +63,7 @@ BEGIN
     INTO produto_nome
     FROM venda_produto vp
     INNER JOIN produto p 
-    ON vp.cod = p.id
+    ON vp.cod = p.cod
     INNER JOIN venda v 
     ON vp.nota_fiscal = v.nota_fiscal
     WHERE v.data_venda BETWEEN data_inicio AND data_fim
