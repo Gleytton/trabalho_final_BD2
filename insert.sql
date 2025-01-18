@@ -90,7 +90,7 @@ VALUES (1, 1, 1, 10),
 (3, 1, 6, 5),
 (4, 1, 3, 3);
 
-INSERT INTO orcamento_produto (cod, cod_orcamento, cod_produto, quant, valor_custo)
+INSERT INTO orcamento_produto (cod, cod_orcamento, cod_produto, quant, valor_custo_unitario)
 VALUES (1, 2, 1, 10, 3.10),
 (2, 2, 2, 12, 3.60),
 (3, 2, 6, 5, 6.00),
@@ -99,4 +99,4 @@ VALUES (1, 2, 1, 10, 3.10),
 INSERT INTO lista_orcamento (cod, cod_lista, cod_orcamento)
 VALUES
     (1, 1, 1),
-    (1, 1, 2);
+    (2, 1, 2);
