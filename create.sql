@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS venda_produto(
 	cod_venda INT NOT NULL,
 	cod_produto INT NOT NULL,
 	quant INT NOT NULL,
-	valor_unitario DECIMAL(5,2) NOT NULL,
+	valor_unitario DECIMAL(5,2),
 	valor DECIMAL(10,2),
 	data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
 	data_modificacao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -181,7 +181,8 @@ CREATE TABLE IF NOT EXISTS orcamento_produto(
 	cod_orcamento INT NOT NULL,
 	cod_produto INT NOT NULL,
 	quant INT NOT NULL,
-	valor_custo DECIMAL(5,2) NOT NULL,
+	valor_custo_unitario DECIMAL(5,2) NOT NULL,
+	valor_custo_total DECIMAL(20, 2),
 	data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
 	data_modificacao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
