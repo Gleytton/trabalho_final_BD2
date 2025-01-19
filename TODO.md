@@ -2,26 +2,15 @@
 
 ## Modelo ER
 
-- [ ] Consertar o MER
-
-### Sugestões de alterações na modelagem
-
-- [ ] Criar tabela `Ponto`
-- Cada cliente terá o seu horário chegada e saída registrado no ponto
-- `ponto(cod, codFuncionario, horaData, atrasado)`
-- `codFuncionario` aponta para `cod` do `funcionario`
-
-- [ ] Cria tabela `Escala`
-- Uma tabela onde terá o horário da escala do funcionário
-- `escala (cod, codFuncionario, horaData)`
-- `codFuncionario` aponta para `cod` do `funcionario`
+- [x] Consertar o MER
 
 ## Modelo Físico
 
-- [ ] A partir do MER atualizado **consertar** e **inserir** as novas tabelas no Modelo Físico
-- [ ] Inserir dados no Banco de Dados
-- [ ] Refazer as procedures/functions simples
-- [ ] Refazer as consultas simples
+- [x] A partir do MER atualizado **consertar** e **inserir** as novas tabelas no Modelo Físico
+- [x] Inserir dados no Banco de Dados
+- [x] Refazer as procedures/functions simples
+- [x] Refazer as consultas simples
+- [x] Refazer as views e index
 
 ## Verificação de erros
 
