@@ -62,15 +62,16 @@ VALUES
 (19, 3, 'Condicionador 250ml', 20, 16.00),
 (20, 4, 'Sabão em Pó 1kg', 35, 18.50);
 
-INSERT INTO venda(cod, cod_colaborador, cod_cliente)
+INSERT INTO venda(cod, cod_colaborador, cod_cliente, data_venda)
 VALUES 
-    (1, 3, 2);
+    (1, 3, 2, '2025-01-02');
 
 INSERT INTO venda_produto (cod, cod_venda, cod_produto, quant)
-VALUES
-    (1, 1, 1, 2),
-    (2, 1, 2, 1),
-    (3, 1, 3, 5);
+VALUES (1, 1, 1, 2);
+INSERT INTO venda_produto (cod, cod_venda, cod_produto, quant)
+VALUES (2, 1, 2, 10);
+INSERT INTO venda_produto (cod, cod_venda, cod_produto, quant)
+VALUES (3, 1, 3, 5);
 
 INSERT INTO lista(cod, cod_gerente) VALUES (1, 1);
 
@@ -94,7 +95,7 @@ INSERT INTO orcamento_produto (cod, cod_orcamento, cod_produto, quant, valor_cus
 VALUES (1, 2, 1, 10, 3.10),
 (2, 2, 2, 12, 3.60),
 (3, 2, 6, 5, 6.00),
-(4, 2, 3, 3, 3.13);
+(4, 2, 3, 2, 3.13);
 
 INSERT INTO lista_orcamento (cod, cod_lista, cod_orcamento)
 VALUES
