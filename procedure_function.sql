@@ -75,8 +75,8 @@ END $$
 DELIMITER ;
 
 -- Diminuir no estoque a partir de um venda
-DROP PROCEDURE IF EXISTS atualizar_estoque $$
 DELIMITER $$
+DROP PROCEDURE IF EXISTS atualizar_estoque $$
 CREATE PROCEDURE atualizar_estoque(
 	IN p_cod_produto INT,
 	IN p_quantidade INT
@@ -87,38 +87,28 @@ BEGIN
 	WHERE cod = p_cod_produto;
 END $$
 DELIMITER ;
--- Funcao de descontos em compras realizadas (REVISAR)
 
-CREATE OR REPLACE FUNCTION aplicar_desconto(nome TEXT, total NUMERIC)
-RETURNS VOID AS $$
-
-DECLARE
-
-	novo_total NUMERIC;
-
+-- Funcao de descontos em compras realizadas
+DELIMITER $$
+DROP PROCEDURE IF EXISTS aplicar_desconto $$
+CREATE PROCEDURE aplicar_desconto(
+    IN p_cod_venda INT,
+    IN p_total_venda DECIMAL(20, 2)
+)
 BEGIN
+    DECLARE p_desconto DECIMAL (4, 3);
+    -- Determina o desconto com base no total da venda
+	IF p_total_venda <= 100.00 THEN SET p_desconto = 0.05;
+	ELSEIF p_total_venda <= 200.00 THEN SET p_desconto = 0.10;
+	ELSE SET p_desconto = 0.15;
+	END IF;
 
--- se o total for menor que 100, o cliente recebe desconto de 5%
-	IF total < 100 THEN
-		novo_total := total - 0.05*total;
-
---se o total for maior que 100 e  menor que 200, o cliente recebe desconto de 10%
-	ELSIF total > 100 AND total < 200 THEN
-		novo_total := total - 0.10*total;
-
--- se o total for maior que 200, o cliente recebe desconto de 15%
-	ELSE
-		novo_total := total - 0.15*total;
-	END IF
-
- -- atuliza o novo valor na tabela cliente
+    -- Atualiza o novo valor na tabela venda
  	UPDATE venda
- 	SET total = novo_total
- 	WHERE cod_cliente = (SELECT cod_cliente FROM cliente WHERE nome = nome);
-
-END; 
-$$
-LANGUAGE plpgsql;
+ 	SET total = total * (1.00 - p_desconto )
+ 	WHERE cod = p_cod_venda;
+END $$
+DELIMITER ;
 
 -- Adicionar no estoque a partir de um orçamento aprovado
 DELIMITER $$
