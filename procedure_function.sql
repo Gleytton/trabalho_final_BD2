@@ -87,6 +87,38 @@ BEGIN
 	WHERE cod = p_cod_produto;
 END $$
 DELIMITER ;
+-- Funcao de descontos em compras realizadas (REVISAR)
+
+CREATE OR REPLACE FUNCTION aplicar_desconto(nome TEXT, total NUMERIC)
+RETURNS VOID AS $$
+
+DECLARE
+
+	novo_total NUMERIC;
+
+BEGIN
+
+-- se o total for menor que 100, o cliente recebe desconto de 5%
+	IF total < 100 THEN
+		novo_total := total - 0.05*total;
+
+--se o total for maior que 100 e  menor que 200, o cliente recebe desconto de 10%
+	ELSIF total > 100 AND total < 200 THEN
+		novo_total := total - 0.10*total;
+
+-- se o total for maior que 200, o cliente recebe desconto de 15%
+	ELSE
+		novo_total := total - 0.15*total;
+	END IF
+
+ -- atuliza o novo valor na tabela cliente
+ 	UPDATE venda
+ 	SET total = novo_total
+ 	WHERE cod_cliente = (SELECT cod_cliente FROM cliente WHERE nome = nome);
+
+END; 
+$$
+LANGUAGE plpgsql;
 
 -- Adicionar no estoque a partir de um orçamento aprovado
 DELIMITER $$
