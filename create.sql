@@ -1,211 +1,182 @@
+-- Active: 1736634064306@@127.0.0.1@3306@mercado_vinicius
 #criar base da dados
 CREATE DATABASE HortFruit;
 
 #criar tabelas
-
+DROP TABLE IF EXISTS cliente;
 CREATE TABLE IF NOT EXISTS cliente(
-
-	cod int  NOT NULL,
+	cod INT AUTO_INCREMENT,
 	cpf VARCHAR(11) NOT NULL,
 	nome VARCHAR(50) NOT NULL,
 	endereco VARCHAR(100) NOT NULL,
-	UF VARCHAR(2) NOT NULL, 
-	telefone VARCHAR(10) NOT NULL,
-	numero_cartao VARCHAR(16) NOT NULL,
-	bandeira VARCHAR(15) NOT NULL,
-	dataEmissao DATE NOT NULL,
-	validade DATE NOT NULL,
-	codSeguranca VARCHAR(5) NOT NULL,
-	pontos INT NOT NULL,
+	telefone VARCHAR(11) NOT NULL,
+	pontos INT DEFAULT 0,
 
-	PRIMARY KEY(cod,numero_cartao)
+	UNIQUE(cpf),
+	PRIMARY KEY (cod)
 ) ;
 
-CREATE TABLE IF NOT EXISTS forma_pagamento(
-
-	cod INT AUTO_INCREMENT NOT NULL,
-	tipo VARCHAR(10) NOT NULL,
-
-	PRIMARY KEY(cod)
-);
-
-CREATE TABLE IF NOT EXISTS cadastrar(
-
-	cod_cliente INT  NOT NULL,	
-	cod_pagCad INT  NOT NULL,
-
-	CONSTRAINT fk_cliente_cadastro FOREIGN KEY (cod_cliente) REFERENCES cliente(cod),
-	CONSTRAINT fk_forma_pagamento_cadastro FOREIGN KEY (cod_pagCad) REFERENCES forma_pagamento(cod),
-
-	PRIMARY KEY (cod_cliente, cod_pagCad)
-);
-
-# TABELA cartao_fidelidade FUI FUNDIDA A TABELA cliente 
-
-
-#fusao das tabelas produto e estoque
-
-# adicao de coluna da tabela Historico_Preco e na tabela  Produto
-
-CREATE TABLE IF NOT EXISTS produto(
-
-	cod VARCHAR(10) NOT NULL,
-	nome VARCHAR(20) NOT NULL,
-	tipo VARCHAR(10) NOT NULL,
-	quant INT NOT NULL,
-	valor_unitario DECIMAL(4,2) NOT NULL,
-	data DATETIME NOT NULL,
-
-	PRIMARY KEY(cod)
-);
-
-
+DROP TABLE IF EXISTS categoria;
 CREATE TABLE IF NOT EXISTS categoria(
-
-	cod VARCHAR(10) NOT NULL,
+	cod INT NOT NULL AUTO_INCREMENT,
 	nome VARCHAR(20) NOT NULL,
-	tipo VARCHAR(10) NOT NULL,
+	tipo VARCHAR(20) NOT NULL,
 
-	PRIMARY KEY(cod)
+	PRIMARY KEY (cod)
 );
 
-CREATE TABLE IF NOT EXISTS produto_categoria (
-
-	cod_prod VARCHAR(10) NOT NULL,
-	cod_cat VARCHAR(10) NOT NULL,
-	
-	PRIMARY KEY (cod_prod),
-
-	CONSTRAINT fk_Prod_ProdCat FOREIGN KEY(cod_prod) REFERENCES produto(cod),
-	CONSTRAINT fk_Cat_ProdCat FOREIGN KEY(cod_cat) REFERENCES categoria(cod)
-
-);
-
-
-#Adição de coluna da tabela ponto na tabela colaborador
-
-CREATE TABLE IF NOT EXISTS colaborador(
-
- 	cpf VARCHAR(11) NOT NULL,
-	nome VARCHAR(50) NOT NULL,
-	endereco VARCHAR(100) NOT NULL,
-	UF VARCHAR(2) NOT NULL, 
-	telefone VARCHAR(10) NOT NULL,
-	ponto DATETIME,
-	atribuicao VARCHAR(100) NOT NULL,
-	PRIMARY KEY(cpf)
-);
-
-CREATE TABLE IF NOT EXISTS colaborador_gerente(
-
-	cpf VARCHAR(11) NOT NULL,
-	area VARCHAR(10) NOT NULL,
-	CONSTRAINT fk_colador_colaborador_gerente  FOREIGN KEY (cpf) REFERENCES colaborador(cpf)
-);
-
-CREATE TABLE IF NOT EXISTS colaborador_funcionario(
-
-	cpf VARCHAR(11) NOT NULL,
-	funcao VARCHAR(50) NOT NULL,
-	CONSTRAINT fk_colador_colaborador_funcionario  FOREIGN KEY (cpf) REFERENCES colaborador(cpf)
-
-);
-
-
-CREATE TABLE IF NOT EXISTS venda(
-
-	nota_fiscal VARCHAR(20) NOT NULL,
-	nome_produto VARCHAR(20) NOT NULL,
-	cpf_funcionario VARCHAR(50) NOT NULL,
-	cod_cliente int NOT NULL,
-	total DECIMAL(10, 2),
-	data DATETIME NOT NULL,
-	CONSTRAINT fk_venda_colaborador FOREIGN KEY (cpf_funcionario) REFERENCES colaborador(cpf),
-	CONSTRAINT fk_venda_cliente FOREIGN KEY (cod_cliente) REFERENCES cliente(cod),
-
-	PRIMARY KEY(nota_fiscal)
-
-);
-
-CREATE TABLE IF NOT EXISTS venda_produto(
-
-	nota_fiscal VARCHAR(20) NOT NULL,	
-	cod VARCHAR(10) NOT NULL,
+DROP TABLE IF EXISTS produto;
+CREATE TABLE IF NOT EXISTS produto(
+	cod INT NOT NULL AUTO_INCREMENT ,
+	cod_categoria INT NOT NULL,
+	nome VARCHAR(30) NOT NULL,
 	quant INT NOT NULL,
-	valor_unitario DECIMAL(4,2) NOT NULL,
-	valor DECIMAL(4,2) NOT NULL,
+	valor_unitario DECIMAL(5,2) NOT NULL,
 
-	CONSTRAINT fk_venda_venda_produto FOREIGN KEY (nota_fiscal) REFERENCES venda(nota_fiscal),
-	CONSTRAINT fk_produto_venda_produto FOREIGN KEY (cod) REFERENCES produto(cod),
-
-	PRIMARY KEY(nota_fiscal,cod)
-
+	FOREIGN KEY (cod_categoria) REFERENCES categoria(cod) ON DELETE RESTRICT,
+	UNIQUE(nome),
+	PRIMARY KEY (cod)
 );
 
-CREATE TABLE IF NOT EXISTS fornecedor(
-
-	cnpj VARCHAR(20) NOT NULL,
-	nome VARCHAR(20) NOT NULL,
-	endereco VARCHAR(100) NOT NULL,
-	UF VARCHAR(2) NOT NULL, 
-	telefone VARCHAR(10) NOT NULL,
-
-	PRIMARY KEY(cnpj)
-);
-
-CREATE TABLE IF NOT EXISTS contrata(
-
-	cpf_gerente VARCHAR(11) NOT NULL,
-	cnpj_fornecedor VARCHAR(20) NOT NULL,
-	data DATETIME,
-
-	CONSTRAINT fk_Funcionario_Contrata FOREIGN KEY (cpf_gerente) REFERENCES colaborador(cpf) ,
-	CONSTRAINT fk_Fornecedor_Contrata FOREIGN KEY (cnpj_fornecedor) REFERENCES fornecedor(cnpj),
-
-	PRIMARY KEY (cpf_gerente, cnpj_fornecedor)
-);
-
-
-CREATE TABLE IF NOT EXISTS entrega(
-
-	cod VARCHAR(10) NOT NULL,
-	nome_cliente VARCHAR(50),
-	data_ent DATETIME NOT NULL,
- 
-	PRIMARY KEY(cod)
-
-);
-
-CREATE TABLE IF NOT EXISTS fornecedor_entrega(
-
-	cnpj_fornecedor VARCHAR(20) NOT NULL,
-	cod_entrega VARCHAR(10) NOT NULL,
-
-	PRIMARY KEY(cnpj_fornecedor,cod_entrega),
-
-	CONSTRAINT fk_fornecedor_fornecedor_entrega FOREIGN KEY (cnpj_fornecedor) REFERENCES fornecedor(cnpj),
-	CONSTRAINT fk_entrega_fornecedor_entrega FOREIGN KEY (cod_entrega) REFERENCES entrega(cod)
-);
-
-CREATE TABLE IF NOT EXISTS entrega_produto(
-
-	cod_prod VARCHAR(10) NOT NULL,
-	cod_entrega VARCHAR(10) NOT NULL,
-
-	PRIMARY KEY(cod_prod,cod_entrega),
-
-	CONSTRAINT fk_produto_entrega_produto FOREIGN KEY (cod_prod) REFERENCES produto(cod),
-
-	CONSTRAINT fk_entrega_entrega_produto FOREIGN KEY (cod_entrega) REFERENCES entrega(cod)
-
-
-);
 -- Tabela que registra as alterações de preço
+DROP TABLE IF EXISTS historico_preco;
 CREATE TABLE IF NOT EXISTS historico_preco (
-	cod VARCHAR(10) NOT NULL PRIMARY KEY,
-	cod_produto VARCHAR(10) NOT NULL,
-	preco DECIMAL(4,2),
-	data_inicio TIMESTAMP,
-	data_fim TIMESTAMP,
-	FOREIGN KEY (cod_produto) REFERENCES produto (cod),
+	cod INT NOT NULL AUTO_INCREMENT,
+	cod_produto INT NOT NULL,
+	preco DECIMAL(5,2) NOT NULL,
+	data_inicio DATETIME,
+	data_fim DATETIME,
+
+	PRIMARY KEY (cod),
+	FOREIGN KEY (cod_produto) REFERENCES produto (cod) ON DELETE RESTRICT
+);
+
+
+DROP TABLE IF EXISTS colaborador;
+CREATE TABLE IF NOT EXISTS colaborador(
+	cod INT NOT NULL AUTO_INCREMENT,
+ 	cpf VARCHAR(11) NOT NULL,
+	nome VARCHAR(255) NOT NULL,
+	ativo BOOLEAN DEFAULT TRUE,
+	PRIMARY KEY (cod),
+	UNIQUE(cpf)
+);
+
+DROP TABLE IF EXISTS gerente;
+CREATE TABLE IF NOT EXISTS gerente(
+	cod INT NOT NULL AUTO_INCREMENT,
+	cod_colaborador INT NOT NULL,
+
+	PRIMARY KEY (cod),
+	FOREIGN KEY (cod_colaborador) REFERENCES colaborador(cod) ON DELETE RESTRICT
+);
+DROP TABLE IF EXISTS subordinado;
+CREATE TABLE IF NOT EXISTS subordinado(
+	cod INT NOT NULL AUTO_INCREMENT,
+	cod_colaborador INT NOT NULL,
+	cod_gerente INT NOT NULL,
+
+	PRIMARY KEY (cod),
+	FOREIGN KEY (cod_colaborador) REFERENCES colaborador(cod) ON DELETE RESTRICT,
+	FOREIGN KEY (cod_gerente) REFERENCES gerente(cod) ON DELETE RESTRICT
+);
+
+DROP TABLE IF EXISTS venda;
+CREATE TABLE IF NOT EXISTS venda(
+	cod INT NOT NULL AUTO_INCREMENT,
+	cod_colaborador INT NOT NULL,
+	cod_cliente INT,
+	total DECIMAL(20, 2) DEFAULT 0.00,
+	data_venda DATE NOT NULL,
+
+
+	PRIMARY KEY(cod),
+	FOREIGN KEY (cod_colaborador) REFERENCES colaborador(cod) ON DELETE RESTRICT,
+	FOREIGN KEY (cod_cliente) REFERENCES cliente(cod) ON DELETE SET NULL
+);
+
+DROP TABLE IF EXISTS venda_produto;
+CREATE TABLE IF NOT EXISTS venda_produto(
+	cod INT NOT NULL AUTO_INCREMENT,
+	cod_venda INT NOT NULL,
+	cod_produto INT NOT NULL,
+	quant INT NOT NULL,
+	valor_unitario DECIMAL(5,2),
+	valor DECIMAL(10,2),
+
+	PRIMARY KEY(cod),
+	FOREIGN KEY (cod_venda) REFERENCES venda(cod) ON DELETE RESTRICT,
+	FOREIGN KEY (cod_produto) REFERENCES produto(cod) ON DELETE RESTRICT
+);
+DROP TABLE IF EXISTS fornecedor;
+CREATE TABLE IF NOT EXISTS fornecedor(
+	cod INT NOT NULL AUTO_INCREMENT,
+	cnpj VARCHAR(14) NOT NULL UNIQUE,
+	nome VARCHAR(255) NOT NULL,
+	endereco VARCHAR(255) NOT NULL, 
+	telefone VARCHAR(11) NOT NULL,
+
+	PRIMARY KEY(cod)
+);
+DROP TABLE IF EXISTS lista;
+CREATE TABLE IF NOT EXISTS lista(
+	cod INT NOT NULL AUTO_INCREMENT,
+	cod_gerente INT NOT NULL,
+
+	PRIMARY KEY(cod),
+	FOREIGN KEY (cod_gerente) REFERENCES gerente(cod) ON DELETE RESTRICT
+);
+DROP TABLE IF EXISTS lista_produto;
+CREATE TABLE IF NOT EXISTS lista_produto(
+	cod INT NOT NULL AUTO_INCREMENT,
+	cod_lista INT NOT NULL,
+	cod_produto INT NOT NULL,
+	quant INT NOT NULL,
+
+	PRIMARY KEY(cod),
+	FOREIGN KEY (cod_lista) REFERENCES lista(cod) ON DELETE RESTRICT,
+	FOREIGN KEY (cod_produto) REFERENCES produto(cod) ON DELETE RESTRICT
+);
+DROP TABLE IF EXISTS lista_fornecedor;
+CREATE TABLE IF NOT EXISTS lista_fornecedor(
+	cod INT NOT NULL AUTO_INCREMENT,
+	cod_lista INT NOT NULL,
+	cod_fornecedor INT NOT NULL,
+
+	PRIMARY KEY(cod),
+	FOREIGN KEY (cod_lista) REFERENCES lista(cod) ON DELETE RESTRICT,
+	FOREIGN KEY (cod_fornecedor) REFERENCES fornecedor(cod) ON DELETE RESTRICT
+);
+DROP TABLE IF EXISTS orcamento;
+CREATE TABLE IF NOT EXISTS orcamento(
+	cod INT NOT NULL AUTO_INCREMENT,
+	cod_fornecedor INT NOT NULL,
+	total DECIMAL(30, 2) DEFAULT 0,
+	foi_aprovado BOOLEAN DEFAULT FALSE,
+
+	PRIMARY KEY(cod),
+	FOREIGN KEY (cod_fornecedor) REFERENCES fornecedor(cod) ON DELETE RESTRICT
+);
+DROP TABLE IF EXISTS orcamento_produto;
+CREATE TABLE IF NOT EXISTS orcamento_produto(
+	cod INT NOT NULL AUTO_INCREMENT,
+	cod_orcamento INT NOT NULL,
+	cod_produto INT NOT NULL,
+	quant INT NOT NULL,
+	valor_custo_unitario DECIMAL(5,2) NOT NULL,
+	valor_custo_total DECIMAL(20, 2) DEFAULT 0,
+
+	PRIMARY KEY(cod),
+	FOREIGN KEY (cod_orcamento) REFERENCES orcamento(cod) ON DELETE RESTRICT,
+	FOREIGN KEY (cod_produto) REFERENCES produto(cod) ON DELETE RESTRICT
+);
+DROP TABLE IF EXISTS lista_orcamento;
+CREATE TABLE IF NOT EXISTS lista_orcamento (
+	cod INT NOT NULL AUTO_INCREMENT,
+	cod_lista INT NOT NULL,
+	cod_orcamento INT NOT NULL,
+
+	PRIMARY KEY(cod),
+	FOREIGN KEY (cod_lista) REFERENCES lista(cod) ON DELETE RESTRICT,
+	FOREIGN KEY (cod_orcamento) REFERENCES orcamento(cod) ON DELETE RESTRICT
 );

@@ -1,56 +1,93 @@
--- Atualiza o preço do produto
-DELIMITER $$ 
-CREATE PROCEDURE atualizar_preco_produto (
-	IN p_produto_id VARCHAR(10),
-	IN p_novo_preco DECIMAL (4,2)
-)
-BEGIN
-	UPDATE produto
-    SET valor_unitario = p_novo_preco, data = NOW()
-	WHERE cod = p_produto_id;
-END $$
-DELIMITER ;
-
 -- Registra a alteração de preço do produto
 DELIMITER $$
+DROP PROCEDURE IF EXISTS registrar_alteracao_preco $$
 CREATE PROCEDURE registrar_alteracao_preco (
-	IN p_produto_id VARCHAR(10),
-    IN p_novo_preco DECIMAL (4,2) 
+	IN p_produto_cod INT,
+    IN p_novo_preco DECIMAL (5,2) 
 )
 BEGIN
 	-- Finaliza o registro da última alteração de preço de um produto no histórico
 	UPDATE historico_preco 
 	SET data_fim = NOW()
-	WHERE cod_produto = p_produto_id AND data_fim IS NULL;
+	WHERE cod_produto = p_produto_cod AND data_fim IS NULL;
 			
 	-- Registra o novo preço de um produto no histórico
 	INSERT INTO historico_preco (cod_produto, preco, data_inicio, data_fim)
-	VALUES(p_produto_id, p_novo_preco, NOW(), NULL);
+	VALUES(p_produto_cod, p_novo_preco, NOW(), NULL);
 END $$
 DELIMITER ;
 
 -- Atualiza a pontuação de um cliente
 DELIMITER $$
+DROP PROCEDURE IF EXISTS atualizar_pontos_fidelidade $$
 CREATE PROCEDURE atualizar_pontos_fidelidade (
-	IN p_nota_fiscal VARCHAR(20)
+	IN p_venda_produto_cod INT
 )
 BEGIN
-	DECLARE p_total_venda DECIMAL (4, 2);
-    DECLARE pontos_venda INT;
+	DECLARE p_total_venda_produto DECIMAL (20, 2);
+    DECLARE pontos_venda_produto INT;
 	DECLARE p_cliente_cod INT;
-    
-    SET p_total_venda = (SELECT total FROM venda WHERE nota_fiscal = p_nota_fiscal);
-    SET p_cliente_cod = (SELECT cod_cliente FROM venda WHERE nota_fiscal = p_nota_fiscal);
-    SET pontos_venda = FLOOR(p_total_venda); -- R$ 1 GASTO = 1 PONTO
+
+    SET p_cliente_cod = (
+        SELECT cl.cod
+        FROM venda_produto vp
+        INNER JOIN venda v ON v.cod = vp.cod_venda
+        INNER JOIN cliente cl ON v.cod_cliente = cl.cod
+        WHERE vp.cod = p_venda_produto_cod);
+    SET p_total_venda_produto = (SELECT vp.valor FROM venda_produto vp WHERE vp.cod = p_venda_produto_cod);
+    SET pontos_venda_produto = FLOOR(p_total_venda_produto); -- R$ 1 GASTO = 1 PONTO
 	
     -- Aumenta a pontuação do cartão fidelidade
     UPDATE cliente
-    SET pontos = pontos + pontos_venda
+    SET pontos = pontos + pontos_venda_produto
     WHERE cod = p_cliente_cod;
 END $$
 DELIMITER ;
 
--- Funcao de descontos em compras realizadas
+-- Atualiza o total de uma venda
+DELIMITER $$
+DROP PROCEDURE IF EXISTS calcular_total $$
+CREATE PROCEDURE calcular_total (
+	IN p_venda_cod INT,
+	IN p_venda_produto_total DECIMAL(10, 2)
+)
+BEGIN
+    -- Atualiza o valor de uma venda
+    UPDATE venda
+    SET total = total + p_venda_produto_total
+    WHERE cod = p_venda_cod;
+END $$
+DELIMITER ;
+
+-- Atualiza o total do orçamento
+DELIMITER $$
+DROP PROCEDURE IF EXISTS calcular_orcamento $$
+CREATE PROCEDURE calcular_orcamento (
+	IN p_orcamento_cod INT,
+	IN p_orcamento_produto_custo_total DECIMAL(10, 2)
+)
+BEGIN
+    -- Atualiza o valor de uma venda
+    UPDATE orcamento
+    SET total = total + p_orcamento_produto_custo_total
+    WHERE cod = p_orcamento_cod;
+END $$
+DELIMITER ;
+
+-- Diminuir no estoque a partir de um venda
+DROP PROCEDURE IF EXISTS atualizar_estoque $$
+DELIMITER $$
+CREATE PROCEDURE atualizar_estoque(
+	IN p_cod_produto INT,
+	IN p_quantidade INT
+)
+BEGIN
+	UPDATE produto
+	SET quant = quant + p_quantidade
+	WHERE cod = p_cod_produto;
+END $$
+DELIMITER ;
+-- Funcao de descontos em compras realizadas (REVISAR)
 
 CREATE OR REPLACE FUNCTION aplicar_desconto(nome TEXT, total NUMERIC)
 RETURNS VOID AS $$
@@ -83,28 +120,36 @@ END;
 $$
 LANGUAGE plpgsql;
 
--- Encontra o preço em que um determindo produto foi mais comprado
+-- Adicionar no estoque a partir de um orçamento aprovado
 DELIMITER $$
-CREATE FUNCTION encontrar_preco_mais_comprado (produto_cod VARCHAR(10))
-RETURNS DECIMAL(4, 2)
-DETERMINISTIC
+DROP PROCEDURE IF EXISTS adicionar_estoque_a_partir_orcamento $$
+CREATE PROCEDURE adicionar_estoque_a_partir_orcamento(
+    IN p_cod_orcamento INT
+)
 BEGIN
-    DECLARE preco_mais_comprado DECIMAL(4, 2);
+    DECLARE v_cod_produto INT;
+    DECLARE v_quant INT;
 
-    -- Seleciona o preço mais comprado com base nas vendas
-    SELECT hp.preco 
-    INTO preco_mais_comprado
-    FROM venda_produto vp
-    JOIN venda v 
-    ON vp.nota_fiscal = v.nota_fiscal
-    JOIN historico_preco hp
-    ON vp.cod = hp.cod_produto 
-    AND v.data BETWEEN hp.data_inicio AND COALESCE(hp.data_fim, CURRENT_DATE)
-    WHERE vp.nota_fiscal = v.nota_fiscal
-    GROUP BY hp.preco
-    ORDER BY SUM(vp.quant) DESC
-    LIMIT 1;
-    
-    RETURN preco_mais_comprado;
+    DECLARE cur_produto CURSOR FOR
+    SELECT op.cod_produto, op.quant
+    FROM orcamento_produto op
+    WHERE op.cod_orcamento = p_cod_orcamento;
+
+    OPEN cur_produto;
+
+    read_loop: LOOP
+        FETCH cur_produto INTO v_cod_produto, v_quant;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        UPDATE produto
+        SET quant = quant + v_quant
+        WHERE cod = v_cod_produto;
+
+    END LOOP;
+
+    CLOSE cur_produto;
 END $$
 DELIMITER ;
