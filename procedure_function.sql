@@ -50,29 +50,38 @@ BEGIN
 END $$
 DELIMITER ;
 
--- Encontra o produto mais vendido dado um range de tempo
-DELIMITER $$
-CREATE FUNCTION produto_mais_vendido (data_inicio DATETIME, data_fim DATETIME)
-RETURNS VARCHAR(255)
-DETERMINISTIC
+-- Funcao de descontos em compras realizadas
+
+CREATE OR REPLACE FUNCTION aplicar_desconto(nome TEXT, total NUMERIC)
+RETURNS VOID AS $$
+
+DECLARE
+
+	novo_total NUMERIC;
+
 BEGIN
-    DECLARE produto_nome VARCHAR(255);
 
-    -- Consulta para obter o nome do produto mais vendido
-    SELECT p.nome
-    INTO produto_nome
-    FROM venda_produto vp
-    INNER JOIN produto p 
-    ON vp.cod = p.cod
-    INNER JOIN venda v 
-    ON vp.nota_fiscal = v.nota_fiscal
-    WHERE v.data_venda BETWEEN data_inicio AND data_fim
-    GROUP BY p.cod, p.nome
-    ORDER BY SUM(vp.quant) DESC
-    LIMIT 1;
+-- se o total for menor que 100, o cliente recebe desconto de 5%
+	IF total < 100 THEN
+		novo_total := total - 0.05*total;
 
-    RETURN produto_nome;
-END $$
+--se o total for maior que 100 e  menor que 200, o cliente recebe desconto de 10%
+	ELSIF total > 100 AND total < 200 THEN
+		novo_total := total - 0.10*total;
+
+-- se o total for maior que 200, o cliente recebe desconto de 15%
+	ELSE
+		novo_total := total - 0.15*total;
+	END IF
+
+ -- atuliza o novo valor na tabela cliente
+ 	UPDATE venda
+ 	SET total = novo_total
+ 	WHERE cod_cliente = (SELECT cod_cliente FROM cliente WHERE nome = nome);
+
+END; 
+$$
+LANGUAGE plpgsql;
 
 -- Encontra o preço em que um determindo produto foi mais comprado
 DELIMITER $$

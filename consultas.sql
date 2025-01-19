@@ -2,9 +2,20 @@
 
  SELECT e.data_ent FROM entrega AS e, entrega_produto AS ep WHERE e.cod = ep.cod_entrega; 
 
--- #2-  consulta: Verificar a quantidade em estoque de um produto X
+-- #2-  consulta: Encontra o produto mais vendido dado um range de tempo
 
- SELECT p.quant FROM produto AS p WHERE p.nome = "?" ;
+   SELECT p.nome
+    INTO produto_nome
+    FROM venda_produto vp
+    INNER JOIN produto p 
+    ON vp.cod = p.cod
+    INNER JOIN venda v 
+    ON vp.nota_fiscal = v.nota_fiscal
+    WHERE v.data_venda BETWEEN data_inicio AND data_fim
+    GROUP BY p.cod, p.nome
+    ORDER BY SUM(vp.quant) DESC
+    LIMIT 1;
+
 
 -- #3- consulta: Obter quantidade de atrasos de um funcionário X em no dia
 
@@ -25,9 +36,20 @@ FROM cliente AS c
 GROUP BY c.nome
 ORDER BY MAIOR_PONTO DESC LIMIT 1;
 
--- #7- Quantidade de produtos vendidos em uma venda X
+-- #7- Consulta: Seleciona o preço mais comprado com base nas vendas
 
-SELECT vp.quant FROM venda_produto AS vp WHERE vp.cod = 'x';
+ SELECT hp.preco 
+    INTO preco_mais_comprado
+    FROM venda_produto vp
+    JOIN venda v 
+    ON vp.nota_fiscal = v.nota_fiscal
+    JOIN historico_preco hp
+    ON vp.cod = hp.cod_produto 
+    AND v.data BETWEEN hp.data_inicio AND COALESCE(hp.data_fim, CURRENT_DATE)
+    WHERE vp.nota_fiscal = v.nota_fiscal
+    GROUP BY hp.preco
+    ORDER BY SUM(vp.quant) DESC
+    LIMIT 1;
 
 -- #8- Retorna cpf dos funcionários que tem a função X
 
